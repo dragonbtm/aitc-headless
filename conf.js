@@ -7,14 +7,14 @@ exports.bServeAsHub = false;
 exports.bLight = true;
 
 //手續費
-exports.free = false;
+exports.free = true;
 
 exports.deviceName = 'Headless';
 exports.storage = 'sqlite';
 
 exports.WS_PROTOCOL = 'ws://';
 // exports.hub = 'hub:10060';
-exports.hub = 'hub:10060';
+exports.hub = '47.244.154.153:8286';
 
 exports.permanent_pairing_secret = 'randomstring';
 exports.control_addresses = ['DEVICE ALLOWED TO CHAT'];
@@ -30,10 +30,10 @@ exports.CONSOLIDATION_INTERVAL = 3600*1000;
 
 // this is for runnining RPC service only, see play/rpc_service.js
 // exports.rpcInterface = '127.0.0.1';
-exports.rpcPort = '10065';
+exports.rpcPort = '6332';
 
 
-exports.bizUrl="http://demo.chainfin.online:10036";
+// exports.bizUrl="http://demo.chainfin.online:10036";
 
 
 console.log('finished headless conf');
