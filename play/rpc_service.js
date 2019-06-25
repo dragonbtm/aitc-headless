@@ -83,6 +83,67 @@ function initRPC() {
 	});
 
 	/**
+	 * Send funds to address.
+	 * If address is invalid, then returns "invalid address".
+	 * @param {String} address
+	 * @param {Integer} amount
+	 * @return {String} status
+	 */
+	server.expose('sendtoaddress', function(args, opt, cb) {
+		console.log('sendtoaddress '+JSON.stringify(args));
+		let start_time = Date.now();
+		var amount = args[1];
+		var toAddress = args[0];
+		if (amount && toAddress) {
+			if (validationUtils.isValidAddress(toAddress))
+				headlessWallet.issueChangeAddressAndSendPayment(null, amount, toAddress, null, function(err, unit) {
+					console.log('sendtoaddress '+JSON.stringify(args)+' took '+(Date.now()-start_time)+'ms, unit='+unit+', err='+err);
+					cb(err, err ? undefined : unit);
+				});
+			else
+				cb("invalid address");
+		}
+		else
+			cb("wrong parameters");
+	});
+
+	/**
+	 * Creates and returns new wallet address.
+	 * @return {String} address
+	 */
+	server.expose('getnewaddress', function(args, opt, cb) {
+		mutex.lock(['rpc_getnewaddress'], function(unlock){
+			walletDefinedByKeys.issueNextAddress(wallet_id, 0, function(addressInfo) {
+				unlock();
+				cb(null, addressInfo.address);
+			});
+		});
+	});
+
+	/**
+	 * Returns transaction list.
+	 * If address is invalid, then returns "invalid address".
+	 * @param {String} address or {since_mci: {Integer}, unit: {String}}
+	 * @return [{"action":{'invalid','received','sent','moved'},"amount":{Integer},"my_address":{String},"arrPayerAddresses":[{String}],"confirmations":{0,1},"unit":{String},"fee":{Integer},"time":{String},"level":{Integer},"asset":{String}}] transactions
+	 *
+	 * If no address supplied, returns wallet transaction list.
+	 * @return [{"action":{'invalid','received','sent','moved'},"amount":{Integer},"my_address":{String},"arrPayerAddresses":[{String}],"confirmations":{0,1},"unit":{String},"fee":{Integer},"time":{String},"level":{Integer},"asset":{String}}] transactions
+	 */
+	server.expose('listtransactions', function(args, opt, cb) {
+		let limit = args[0];
+		let start_time = Date.now();
+		var opts = {wallet: wallet_id};
+		opts.limit = limit || 200;
+
+		Wallet.readTransactionHistory(opts, function(result) {
+			console.log('listtransactions '+JSON.stringify(args)+' took '+(Date.now()-start_time)+'ms');
+			cb(null, result);
+		});
+
+	});
+
+
+	/**
 	 * 發送交易
 	 */
 	server.expose('sendtransaction', function(args, opt, cb) {
@@ -158,6 +219,16 @@ function initRPC() {
 	});
 
 
+
+
+	/**
+	 * 心跳检测
+	 */
+	server.expose('ping',function (args, opt, cb) {
+		cb(null,"pong");
+	});
+
+
 	/**
 	 * 查詢交易記錄
 	 */
@@ -200,14 +271,6 @@ function initRPC() {
 
 
 	/**
-	 * 心跳检测
-	 */
-	server.expose('ping',function (args, opt, cb) {
-		cb(null,"pong");
-	});
-
-
-	/**
 	 * 獲取創世地址
 	 */
 	server.expose('getaddress', function(args, opt, cb) {
@@ -244,29 +307,13 @@ function initRPC() {
 	 * Validates address.
 	 * @return {boolean} is_valid
 	 */
-	server.expose('validateaddress', function(args, opt, cb) {
-		var address = args[0];
-		cb(null, validationUtils.isValidAddress(address));
-	});
-
 	// alias for validateaddress
 	server.expose('verifyaddress', function(args, opt, cb) {
 		var address = args[0];
 		cb(null, validationUtils.isValidAddress(address));
 	});
 
-	/**
-	 * Creates and returns new wallet address.
-	 * @return {String} address
-	 */
-	server.expose('getnewaddress', function(args, opt, cb) {
-		mutex.lock(['rpc_getnewaddress'], function(unlock){
-			walletDefinedByKeys.issueNextAddress(wallet_id, 0, function(addressInfo) {
-				unlock();
-				cb(null, addressInfo.address);
-			});
-		});
-	});
+
 
 
 
@@ -293,7 +340,7 @@ function initRPC() {
 	 * If no address supplied, returns wallet transaction list.
 	 * @return [{"action":{'invalid','received','sent','moved'},"amount":{Integer},"my_address":{String},"arrPayerAddresses":[{String}],"confirmations":{0,1},"unit":{String},"fee":{Integer},"time":{String},"level":{Integer},"asset":{String}}] transactions
 	 */
-	server.expose('listtransactions', function(args, opt, cb) {
+	server.expose('listtallransactions', function(args, opt, cb) {
 		let start_time = Date.now();
 		if (Array.isArray(args) && typeof args[0] === 'string') {
 			var address = args[0];
@@ -320,30 +367,6 @@ function initRPC() {
 
 	});
 
-	/**
-	 * Send funds to address.
-	 * If address is invalid, then returns "invalid address".
-	 * @param {String} address
-	 * @param {Integer} amount
-	 * @return {String} status
-	 */
-	server.expose('sendtoaddress', function(args, opt, cb) {
-		console.log('sendtoaddress '+JSON.stringify(args));
-		let start_time = Date.now();
-		var amount = args[1];
-		var toAddress = args[0];
-		if (amount && toAddress) {
-			if (validationUtils.isValidAddress(toAddress))
-				headlessWallet.issueChangeAddressAndSendPayment(null, amount, toAddress, null, function(err, unit) {
-					console.log('sendtoaddress '+JSON.stringify(args)+' took '+(Date.now()-start_time)+'ms, unit='+unit+', err='+err);
-					cb(err, err ? undefined : unit);
-				});
-			else
-				cb("invalid address");
-		}
-		else
-			cb("wrong parameters");
-	});
 
 	headlessWallet.readSingleWallet(function(_wallet_id) {
 		wallet_id = _wallet_id;
