@@ -95,15 +95,18 @@ function initRPC() {
 		var amount = args[1];
 		var toAddress = args[0];
 		if (amount && toAddress) {
-			if (validationUtils.isValidAddress(toAddress))
+			if (validationUtils.isValidAddress(toAddress)) {
+				/*headlessWallet.sendPayment(null, amount, toAddress, "", null, function(err, unit) {
+					console.log('sendtoaddress '+JSON.stringify(args)+' took '+(Date.now()-start_time)+'ms, unit='+unit+', err='+err);
+					cb(err, err ? undefined : unit);
+				});*/
 				headlessWallet.issueChangeAddressAndSendPayment(null, amount, toAddress, null, function(err, unit) {
 					console.log('sendtoaddress '+JSON.stringify(args)+' took '+(Date.now()-start_time)+'ms, unit='+unit+', err='+err);
 					cb(err, err ? undefined : unit);
 				});
-			else
+			} else
 				cb("invalid address");
-		}
-		else
+		} else
 			cb("wrong parameters");
 	});
 

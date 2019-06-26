@@ -12,6 +12,14 @@ exports.free = true;
 exports.deviceName = 'Headless';
 exports.storage = 'sqlite';
 
+exports.database = {
+	host:"localhost",
+	name:"headless",
+	user:"root",
+	password:"root"
+}
+
+
 exports.WS_PROTOCOL = 'ws://';
 // exports.hub = 'hub:10060';
 exports.hub = '47.244.154.153:8286';
