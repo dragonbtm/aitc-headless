@@ -115,11 +115,20 @@ function initRPC() {
 	 * @return {String} address
 	 */
 	server.expose('getnewaddress', function(args, opt, cb) {
+
+		let index = args[0];
 		mutex.lock(['rpc_getnewaddress'], function(unlock){
-			walletDefinedByKeys.issueNextAddress(wallet_id, 0, function(addressInfo) {
-				unlock();
-				cb(null, addressInfo.address);
-			});
+			if(index) {
+				walletDefinedByKeys.issueAddress(wallet_id, 0, index, function (addressInfo) {
+					unlock();
+					cb(null, addressInfo.address);
+				});
+			}else {
+				walletDefinedByKeys.issueNextAddress(wallet_id, 0, function(addressInfo) {
+					unlock();
+					cb(null, addressInfo.address);
+				});
+			}
 		});
 	});
 
