@@ -50,8 +50,9 @@ function readKeys(onDone){
 		if (err){ // first start
 			console.log('failed to read keys, will gen');
 			initConfJson(rl, function(){
-				rl.question('Passphrase for your private keys: ', function(passphrase){
-					rl.close();
+				// rl.question('Passphrase for your private keys: ', function(passphrase){
+					let passphrase = conf.passphrase ? conf.passphrase : "";
+					// rl.close();
 					if (process.stdout.moveCursor) process.stdout.moveCursor(0, -1);
 					if (process.stdout.clearLine)  process.stdout.clearLine();
 					var deviceTempPrivKey = crypto.randomBytes(32);
@@ -68,12 +69,13 @@ function readKeys(onDone){
 							onDone(mnemonic.phrase, passphrase, deviceTempPrivKey, devicePrevTempPrivKey);
 						});
 					});
-				});
+				// });
 			});
 		}
 		else{ // 2nd or later start
-			rl.question("Passphrase: ", function(passphrase){
-				rl.close();
+			// rl.question("Passphrase: ", function(passphrase){
+				// rl.close();
+				let passphrase = conf.passphrase ? conf.passphrase : "";
 				if (process.stdout.moveCursor) process.stdout.moveCursor(0, -1);
 				if (process.stdout.clearLine)  process.stdout.clearLine();
 				var keys = JSON.parse(data);
@@ -90,7 +92,7 @@ function readKeys(onDone){
 						});
 					}
 				});
-			});
+			// });
 		}
 	});
 }
@@ -561,7 +563,7 @@ function signMessage(signing_address, message, cb) {
 
 
 function handleText(from_address, text, onUnknown){
-	
+
 	text = text.trim();
 	var fields = text.split(/ /);
 	var command = fields[0].trim().toLowerCase();
@@ -582,13 +584,13 @@ function handleText(from_address, text, onUnknown){
 					device.sendMessageToDevice(from_address, 'text', addressInfo.address);
 				});
 			break;
-			
+
 		case 'balance':
 			prepareBalanceText(function(balance_text){
 				device.sendMessageToDevice(from_address, 'text', balance_text);
 			});
 			break;
-			
+
 		case 'pay':
 			analyzePayParams(params[0], params[1], function(asset, amount){
 				if(asset===null && amount===null){

@@ -24,6 +24,8 @@ exports.WS_PROTOCOL = 'ws://';
 // exports.hub = 'hub:10060';
 exports.hub = '47.244.154.153:8286';
 
+exports.passphrase = 'asdf';
+
 exports.permanent_pairing_secret = 'randomstring';
 exports.control_addresses = ['DEVICE ALLOWED TO CHAT'];
 exports.payout_address = 'WHERE THE MONEY CAN BE SENT TO';
