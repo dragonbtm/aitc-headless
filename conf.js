@@ -4,7 +4,7 @@
 //exports.port = 6611;
 //exports.myUrl = 'wss://mydomain.com/bb';
 exports.bServeAsHub = false;
-exports.bLight = true;
+exports.bLight = false;
 
 //手續費
 exports.free = true;
