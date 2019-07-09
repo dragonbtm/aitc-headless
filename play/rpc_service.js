@@ -352,7 +352,7 @@ function initRPC() {
 	 * If no address supplied, returns wallet transaction list.
 	 * @return [{"action":{'invalid','received','sent','moved'},"amount":{Integer},"my_address":{String},"arrPayerAddresses":[{String}],"confirmations":{0,1},"unit":{String},"fee":{Integer},"time":{String},"level":{Integer},"asset":{String}}] transactions
 	 */
-	server.expose('listtallransactions', function(args, opt, cb) {
+	server.expose('listalltransactions', function(args, opt, cb) {
 		let start_time = Date.now();
 		if (Array.isArray(args) && typeof args[0] === 'string') {
 			var address = args[0];
@@ -372,7 +372,7 @@ function initRPC() {
 			else
 				opts.limit = 200;
 			Wallet.readTransactionHistory(opts, function(result) {
-				console.log('listtransactions '+JSON.stringify(args)+' took '+(Date.now()-start_time)+'ms');
+				console.log('listalltransactions '+JSON.stringify(args)+' took '+(Date.now()-start_time)+'ms');
 				cb(null, result);
 			});
 		}
