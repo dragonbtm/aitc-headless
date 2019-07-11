@@ -39,7 +39,7 @@ exports.MAX_UNSPENT_OUTPUTS = 0;
 exports.CONSOLIDATION_INTERVAL = 3600*1000;
 
 // this is for runnining RPC service only, see play/rpc_service.js
-// exports.rpcInterface = '127.0.0.1';
+exports.rpcInterface = '127.0.0.1';
 exports.rpcPort = '6332';
 
 
