@@ -483,7 +483,7 @@ function sendAssetFromAddress(asset, amount, from_address, to_address, recipient
 	});
 }
 
-function issueChangeAddressAndSendPayment(asset, amount, to_address, device_address, onDone){
+function issueChangeAddressAndSendPayment(asset, amount, to_address, device_address, onDone , messages){
 	if(!onDone) {
 		return new Promise((resolve, reject) => {
 			issueChangeAddressAndSendPayment(asset, amount, to_address, device_address, (err, unit, assocMnemonics) => {
@@ -493,7 +493,7 @@ function issueChangeAddressAndSendPayment(asset, amount, to_address, device_addr
 		});
 	}
 	issueChangeAddress(function(change_address){
-		sendPayment(asset, amount, to_address, change_address, device_address, onDone);
+		sendPayment(asset, amount, to_address, change_address, device_address, onDone , messages);
 	});
 }
 

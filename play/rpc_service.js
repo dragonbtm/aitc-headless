@@ -87,13 +87,31 @@ function initRPC() {
 	 * If address is invalid, then returns "invalid address".
 	 * @param {String} address
 	 * @param {Integer} amount
+	 * @param {Integer} app
+	 * @param {Integer} descrption
 	 * @return {String} status
 	 */
 	server.expose('sendtoaddress', function(args, opt, cb) {
 		console.log('sendtoaddress '+JSON.stringify(args));
 		let start_time = Date.now();
-		var amount = args[1];
-		var toAddress = args[0];
+		let amount = args[1];
+		let toAddress = args[0];
+
+		let app = args[2];
+		let descrption = args[3];
+
+		let messages = ""
+		if(app && descrption) {
+			messages = [{
+				app: app,
+				payload_location: "inline",
+				payload_hash: require('core/object_hash.js').getBase64Hash(descrption),
+				payload: descrption
+			}];
+		}
+
+
+
 		if (amount && toAddress) {
 			if (validationUtils.isValidAddress(toAddress)) {
 				/*headlessWallet.sendPayment(null, amount, toAddress, "", null, function(err, unit) {
@@ -103,7 +121,7 @@ function initRPC() {
 				headlessWallet.issueChangeAddressAndSendPayment(null, amount, toAddress, null, function(err, unit) {
 					console.log('sendtoaddress '+JSON.stringify(args)+' took '+(Date.now()-start_time)+'ms, unit='+unit+', err='+err);
 					cb(err, err ? undefined : unit);
-				});
+				} , messages);
 			} else
 				cb("invalid address");
 		} else
