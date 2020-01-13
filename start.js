@@ -216,6 +216,7 @@ function determineIfWalletExists(handleResult){
 	});
 }
 
+// 用本地私钥进行签名
 function signWithLocalPrivateKey(wallet_id, account, is_change, address_index, text_to_sign, handleSig){
 	var path = "m/44'/0'/" + account + "'/"+is_change+"/"+address_index;
 	var privateKey = xPrivKey.derive(path).privateKey;
@@ -325,13 +326,15 @@ function handlePairing(from_address){
 	});
 }
 
-function sendPayment(asset, amount, to_address, change_address, device_address, onDone,messages){
+function sendPayment(asset, amount, to_address, change_address, device_address, onDone, messages, paying_addresses){
 	if(!onDone) {
 		return new Promise((resolve, reject) => {
 			sendPayment(asset, amount, to_address, change_address, device_address, (err, unit, assocMnemonics) => {
 				if (err) return reject(new Error(err));
 				return resolve({unit, assocMnemonics});
-			},messages);
+			},
+			messages,
+			paying_addresses);
 		});
 	}
 	var device = require('core/device.js');
@@ -351,7 +354,8 @@ function sendPayment(asset, amount, to_address, change_address, device_address, 
 			if (onDone)
 				onDone(err, unit, assocMnemonics);
 		},
-		messages
+		messages,
+		paying_addresses
 	);
 }
 

@@ -64,7 +64,9 @@ function initRPC() {
 								};
 								for (var i = 0; i < rows.length; i++) {
 									var row = rows[i];
-									balance.base[row.is_stable ? 'stable' : 'pending'] = (row.balance / 1000000).toFixed(2);
+									// balance.base[row.is_stable ? 'stable' : 'pending'] = (row.balance / 1000000).toFixed(2);
+									balance.base[row.is_stable ? 'stable' : 'pending'] = row.balance;
+
 								}
 								cb(null, balance);
 							}
@@ -94,13 +96,13 @@ function initRPC() {
 	server.expose('sendtoaddress', function(args, opt, cb) {
 		console.log('sendtoaddress '+JSON.stringify(args));
 		let start_time = Date.now();
-		let amount = args[1];
 		let toAddress = args[0];
+		let amount = args[1];
 
 		let app = args[2];
 		let descrption = args[3];
 
-		let messages = ""
+		let messages = "";
 		if(app && descrption) {
 			messages = [{
 				app: app,
@@ -127,6 +129,61 @@ function initRPC() {
 		} else
 			cb("wrong parameters");
 	});
+
+	/**
+	 * Send funds to address.
+	 * If address is invalid, then returns "invalid address".
+	 * @param {String} fromaddress
+	 * @param {String} toaddress
+	 * @param {Integer} amount
+	 * @param {Integer} app
+	 * @param {Integer} descrption
+	 * @return {String} status
+	 */
+	server.expose('send', function(args, opt, cb) {
+		console.log('send '+JSON.stringify(args));
+		let start_time = Date.now();
+		let fromAddress = args[0]
+		let toAddress = args[1]
+		let amount = args[2];
+
+
+		let app = args[3];
+		let descrption = args[4];
+
+		let messages = "";
+		if(app && descrption) {
+			messages = [{
+				app: app,
+				payload_location: "inline",
+				payload_hash: require('core/object_hash.js').getBase64Hash(descrption),
+				payload: descrption
+			}];
+		}
+
+
+
+		if (amount && toAddress && fromAddress) {
+			if (validationUtils.isValidAddress(toAddress) && validationUtils.isValidAddress(fromAddress)) {
+				headlessWallet.sendPayment(null, amount, toAddress, fromAddress, null, function(err, unit) {
+					console.log('sendtoaddress '+JSON.stringify(args)+' took '+(Date.now()-start_time)+'ms, unit='+unit+', err='+err);
+					cb(err, err ? undefined : unit);
+				},
+				messages,
+				[fromAddress]
+				);
+				/*headlessWallet.issueChangeAddressAndSendPayment(null, amount, toAddress, null, function(err, unit) {
+					console.log('sendtoaddress '+JSON.stringify(args)+' took '+(Date.now()-start_time)+'ms, unit='+unit+', err='+err);
+					cb(err, err ? undefined : unit);
+				} , messages);*/
+			} else
+				cb("invalid address");
+		} else
+			cb("wrong parameters");
+	});
+
+
+
 
 	/**
 	 * Creates and returns new wallet address.
