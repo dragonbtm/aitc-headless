@@ -136,7 +136,7 @@ function initRPC() {
 	 * @param {String} fromaddress
 	 * @param {String} toaddress
 	 * @param {Integer} amount
-	 * @param {Integer} app
+	 * @param {Integer} app   defout: text |
 	 * @param {Integer} descrption
 	 * @return {String} status
 	 */

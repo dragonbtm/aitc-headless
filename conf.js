@@ -7,7 +7,7 @@ exports.bServeAsHub = false;
 exports.bLight = false;
 
 //手續費
-exports.free = true;
+exports.free = false;
 
 exports.deviceName = 'Headless';
 exports.storage = 'sqlite';
