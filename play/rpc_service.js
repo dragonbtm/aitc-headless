@@ -143,13 +143,15 @@ function initRPC() {
 	server.expose('send', function(args, opt, cb) {
 		console.log('send '+JSON.stringify(args));
 		let start_time = Date.now();
-		let fromAddress = args[0]
-		let toAddress = args[1]
+		let fromAddress = args[0];
+		let toAddress = args[1];
 		let amount = args[2];
 
 
 		let app = args[3];
 		let descrption = args[4];
+
+		let asset = args[5];
 
 		let messages = "";
 		if(app && descrption) {
@@ -165,7 +167,7 @@ function initRPC() {
 
 		if (amount && toAddress && fromAddress) {
 			if (validationUtils.isValidAddress(toAddress) && validationUtils.isValidAddress(fromAddress)) {
-				headlessWallet.sendPayment(null, amount, toAddress, fromAddress, null, function(err, unit) {
+				headlessWallet.sendPayment(asset, amount, toAddress, fromAddress, null, function(err, unit) {
 					console.log('sendtoaddress '+JSON.stringify(args)+' took '+(Date.now()-start_time)+'ms, unit='+unit+', err='+err);
 					cb(err, err ? undefined : unit);
 				},
@@ -219,8 +221,10 @@ function initRPC() {
 	server.expose('listtransactions', function(args, opt, cb) {
 		let limit = args[0];
 		let start_time = Date.now();
+		let asset = args[1];
 		var opts = {wallet: wallet_id};
 		opts.limit = limit || 200;
+		opts.asset = asset;
 
 		Wallet.readTransactionHistory(opts, function(result) {
 			console.log('listtransactions '+JSON.stringify(args)+' took '+(Date.now()-start_time)+'ms');
@@ -428,11 +432,12 @@ function initRPC() {
 	 * @return [{"action":{'invalid','received','sent','moved'},"amount":{Integer},"my_address":{String},"arrPayerAddresses":[{String}],"confirmations":{0,1},"unit":{String},"fee":{Integer},"time":{String},"level":{Integer},"asset":{String}}] transactions
 	 */
 	server.expose('listalltransactions', function(args, opt, cb) {
+		let asset_name = args.asset;
 		let start_time = Date.now();
 		if (Array.isArray(args) && typeof args[0] === 'string') {
 			var address = args[0];
 			if (validationUtils.isValidAddress(address))
-				Wallet.readTransactionHistory({address: address}, function(result) {
+				Wallet.readTransactionHistory({address: address , asset : asset_name ? asset : null}, function(result) {
 					cb(null, result);
 				});
 			else
@@ -440,6 +445,7 @@ function initRPC() {
 		}
 		else{
 			var opts = {wallet: wallet_id};
+			opts.asset =  asset_name ? asset : null;
 			if (args.unit && validationUtils.isValidBase64(args.unit, constants.HASH_LENGTH))
 				opts.unit = args.unit;
 			else if (args.since_mci && validationUtils.isNonnegativeInteger(args.since_mci))

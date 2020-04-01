@@ -22,7 +22,7 @@ exports.database = {
 
 exports.WS_PROTOCOL = 'ws://';
 // exports.hub = 'hub:10060';
-exports.hub = '47.244.159.27:8286';
+exports.hub = '127.0.0.1:8286';
 
 exports.passphrase = '';
 
@@ -48,7 +48,7 @@ exports.CONSOLIDATION_INTERVAL = 3600*1000;
 
 // this is for runnining RPC service only, see play/rpc_service.js
 exports.rpcInterface = '127.0.0.1';
-exports.rpcPort = '6332';
+exports.rpcPort = '10085';
 
 
 // exports.bizUrl="http://demo.chainfin.online:10036";

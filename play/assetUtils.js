@@ -37,9 +37,9 @@ function balanceOf(assetId,address,cb){
  * @param {Number} amount 		发送的Token的数量，必须为整型
  */
 function transfer(asset,from_address,to_address,amount){
-	var network = require('luxalpacore/network.js');
-	var divisibleAsset = require('luxalpacore/divisible_asset.js');
-	var walletGeneral = require('luxalpacore/wallet_general.js');
+	var network = require('core/network.js');
+	var divisibleAsset = require('core/divisible_asset.js');
+	var walletGeneral = require('core/wallet_general.js');
 	divisibleAsset.composeAndSaveDivisibleAssetPaymentJoint({
 		asset: asset,
 		paying_addresses: [from_address],
@@ -65,8 +65,8 @@ function transfer(asset,from_address,to_address,amount){
  * @param {} cb 		   回调函数
  */
 function issueAsset(asset,address,cb){
-	var composer = require('luxalpacore/composer.js');
-	var network = require('luxalpacore/network.js');
+	var composer = require('core/composer.js');
+	var network = require('core/network.js');
 	var callbacks = composer.getSavingCallbacks({
 		ifNotEnoughFunds: onError,
 		ifError: onError,

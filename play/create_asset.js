@@ -8,12 +8,12 @@ var DivisibleAsset = require('core/divisible_asset.js');
 headlessWallet.setupChatEventHandlers();
 
 eventBus.on('headless_wallet_ready', function(){
-	headlessWallet.readSingleAddress(function(address){
+	headlessWallet.readFirstAddress(function(address){
 		setTimeout(function(){
 			// 第一个参数设定新资产名称
 			// 第二个参数来修改Token的总发行量。
 			var asset = {
-				assets_name: 'QQ',
+				assets_name: 'qwq',
 				cap: 9000000000000,
 				is_private: false,
 				is_transferrable: true,
@@ -23,7 +23,10 @@ eventBus.on('headless_wallet_ready', function(){
 				cosigned_by_definer: false,
 				spender_attested: false,
 			};
-			DivisibleAsset.findeAssetUnitID(asset.assets_name);
+			var unit = DivisibleAsset.findeAssetUnitID(asset.assets_name);
+			if(unit) {
+				throw Error("代币已存在~!");
+			}
 			assetUtils.issueAsset(asset,address,writeTokenId);
 		},3000);
 	});
