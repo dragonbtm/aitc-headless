@@ -18,41 +18,41 @@ function createAsset(){
 		}
 	});
 	var asset = {
-		cap: (1+2*2+5+10+20*2+50+100+200*2+500+1000+2000*2+5000+10000+20000*2+50000+100000)*1e10,
-		//cap: 1000000,
-		is_private: true,
+		// cap: (1+2*2+5+10+20*2+50+100+200*2+500+1000+2000*2+5000+10000+20000*2+50000+100000)*1e10,
+		cap: 1000000,
+		is_private: false,
 		is_transferrable: true,
 		auto_destroy: false,
-		fixed_denominations: true,
+		fixed_denominations: false,
 		issued_by_definer_only: true,
 		cosigned_by_definer: false,
 		spender_attested: false,
 	//    issue_condition: ["in data feed", [["MO7ZZIU5VXHRZGGHVSZWLWL64IEND5K2"], "timestamp", ">=", 1453139371111]],
-	//    transfer_condition: ["has one equal", 
+	//    transfer_condition: ["has one equal",
 	//        {equal_fields: ["address", "amount"], search_criteria: [{what: "output", asset: "base"}, {what: "output", asset: "this asset"}]}
 	//    ],
 
-		denominations: [
-			{denomination: 1, count_coins: 1e10},
-			{denomination: 2, count_coins: 2e10},
-			{denomination: 5, count_coins: 1e10},
-			{denomination: 10, count_coins: 1e10},
-			{denomination: 20, count_coins: 2e10},
-			{denomination: 50, count_coins: 1e10},
-			{denomination: 100, count_coins: 1e10},
-			{denomination: 200, count_coins: 2e10},
-			{denomination: 500, count_coins: 1e10},
-			{denomination: 1000, count_coins: 1e10},
-			{denomination: 2000, count_coins: 2e10},
-			{denomination: 5000, count_coins: 1e10},
-			{denomination: 10000, count_coins: 1e10},
-			{denomination: 20000, count_coins: 2e10},
-			{denomination: 50000, count_coins: 1e10},
-			{denomination: 100000, count_coins: 1e10}
-		],
+		// denominations: [
+		// 	{denomination: 1, count_coins: 1e10},
+		// 	{denomination: 2, count_coins: 2e10},
+		// 	{denomination: 5, count_coins: 1e10},
+		// 	{denomination: 10, count_coins: 1e10},
+		// 	{denomination: 20, count_coins: 2e10},
+		// 	{denomination: 50, count_coins: 1e10},
+		// 	{denomination: 100, count_coins: 1e10},
+		// 	{denomination: 200, count_coins: 2e10},
+		// 	{denomination: 500, count_coins: 1e10},
+		// 	{denomination: 1000, count_coins: 1e10},
+		// 	{denomination: 2000, count_coins: 2e10},
+		// 	{denomination: 5000, count_coins: 1e10},
+		// 	{denomination: 10000, count_coins: 1e10},
+		// 	{denomination: 20000, count_coins: 2e10},
+		// 	{denomination: 50000, count_coins: 1e10},
+		// 	{denomination: 100000, count_coins: 1e10}
+		// ],
 		//attestors: ["X5ZHWBYBF4TUYS35HU3ROVDQJC772ZMG", "GZSEKMEQVOW2ZAHDZBABRTECDSDFBWVH", "2QLYLKHMUG237QG36Z6AWLVH4KQ4MEY6"].sort()
 	};
-	composer.composeAssetDefinitionJoint("3VH6WZ4V5AD2U55MQLRQPHRRCYQCFDUI", asset, headlessWallet.signer, callbacks);
+	composer.composeAssetDefinitionJoint("GX4Q7EWK3GJYOIFRVOZZNS2E3RNWVN7X", asset, headlessWallet.signer, callbacks);
 }
 
 eventBus.on('headless_wallet_ready', createAsset);

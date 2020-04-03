@@ -49,28 +49,37 @@ function initRPC() {
 		if (address) {
 			if (validationUtils.isValidAddress(address))
 				db.query("SELECT COUNT(*) AS count FROM my_addresses WHERE address = ?", [address], function(rows) {
-					if (rows[0].count)
-						db.query(
-							"SELECT asset, is_stable, SUM(amount) AS balance \n\
-                            FROM outputs JOIN units USING(unit) \n\
-                            WHERE is_spent=0 AND address=? AND sequence='good' AND asset IS NULL \n\
-                            GROUP BY is_stable", [address],
-							function(rows) {
-								var balance = {
-									base: {
-										stable: 0,
-										pending: 0
-									}
-								};
-								for (var i = 0; i < rows.length; i++) {
-									var row = rows[i];
-									// balance.base[row.is_stable ? 'stable' : 'pending'] = (row.balance / 1000000).toFixed(2);
-									balance.base[row.is_stable ? 'stable' : 'pending'] = row.balance;
+					if (rows[0].count) {
 
-								}
-								cb(null, balance);
-							}
-						);
+						Wallet.readBalance(address, function(balances) {
+							console.log('getbalance took '+(Date.now()-start_time)+'ms');
+							cb(null, balances);
+						});
+						// db.query(
+						// 	"SELECT asset, is_stable, SUM(amount) AS balance \n\
+                        //     FROM outputs JOIN units USING(unit) \n\
+                        //     WHERE is_spent=0 AND address=? AND sequence='good'  \n\
+                        //     GROUP BY asset, is_stable", [address],
+						// 	function(rows) {
+						// 		var balances = []
+						// 		for (var i = 0; i < rows.length; i++) {
+						//
+						// 			var row = rows[i];
+						// 			var base = row.asset == null ? base : row.asset;
+						//
+						// 			var balance = {
+						// 				base : {
+						// 					stable: 0,
+						// 					pending: 0
+						// 				}
+						// 			};
+						// 			balance.base[row.is_stable ? 'stable' : 'pending'] = row.balance;
+						// 			balances[i] = balance;
+						// 		}
+						// 		cb(null, balances);
+						// 	}
+						// );
+					}
 					else
 						cb("address not found");
 				});
@@ -182,7 +191,73 @@ function initRPC() {
 			cb("wrong parameters");
 	});
 
+	/**
+	 * Send asset to address.
+	 * If address is invalid, then returns "invalid address".
+	 * @param {String} fromaddress
+	 * @param {String} toaddress
+	 * @param {Integer} amount
+	 * @param {Integer} asset
+	 * @return {String} status
+	 */
+	server.expose('sendasset', function(args, opt, cb) {
+		console.log('send '+JSON.stringify(args));
+		let start_time = Date.now();
+		let fromAddress = args[0];
+		let toAddress = args[1];
+		let amount = args[2];
 
+		let asset = args[3];
+
+		if (amount && toAddress && fromAddress && asset) {
+			if (validationUtils.isValidAddress(toAddress) && validationUtils.isValidAddress(fromAddress)) {
+				var divisibleAsset = require('core/divisible_asset.js');
+				divisibleAsset.composeAndSaveDivisibleAssetPaymentJoint({
+					asset: asset,
+					paying_addresses: [fromAddress],
+					fee_paying_addresses: [fromAddress],
+					change_address: fromAddress,
+					to_address: toAddress,
+					amount: amount,
+					signer: headlessWallet.signer,
+					callbacks: {
+						ifError: function(err){
+							cb(err, err );
+						},
+						ifNotEnoughFunds: function(err){
+							cb(err, err);
+						},
+						ifOk: function(objJoint, arrChains){
+							network.broadcastJoint(objJoint);
+							cb(null, objJoint.unit.unit);
+
+							// if (arrChains){ // if the asset is private
+								// send directly to the receiver
+								// network.sendPrivatePayment('ws://192.168.62.28:8286', arrChains);
+
+								// or send to the receiver's device address through the receiver's hub
+								//walletGeneral.sendPrivatePayments("0F7Z7DDVBDPTYJOY7S4P24CW6K23F6B7S", arrChains);
+							// }
+						}
+					}
+				});
+
+				/*headlessWallet.sendPayment(null, amount, toAddress, fromAddress, null, function(err, unit) {
+						console.log('sendtoaddress '+JSON.stringify(args)+' took '+(Date.now()-start_time)+'ms, unit='+unit+', err='+err);
+						cb(err, err ? undefined : unit);
+					},
+					messages,
+					[fromAddress]
+				);*/
+				/*headlessWallet.issueChangeAddressAndSendPayment(null, amount, toAddress, null, function(err, unit) {
+					console.log('sendtoaddress '+JSON.stringify(args)+' took '+(Date.now()-start_time)+'ms, unit='+unit+', err='+err);
+					cb(err, err ? undefined : unit);
+				} , messages);*/
+			} else
+				cb("invalid address");
+		} else
+			cb("wrong parameters");
+	});
 
 
 	/**
@@ -221,6 +296,11 @@ function initRPC() {
 		let start_time = Date.now();
 		var opts = {wallet: wallet_id};
 		opts.limit = limit || 200;
+
+		let asset = args[1];
+		if(asset) {
+			opts.asset = asset;
+		}
 
 		Wallet.readTransactionHistory(opts, function(result) {
 			console.log('listtransactions '+JSON.stringify(args)+' took '+(Date.now()-start_time)+'ms');
