@@ -22,7 +22,7 @@ exports.database = {
 
 exports.WS_PROTOCOL = 'ws://';
 // exports.hub = 'hub:10060';
-exports.hub = '47.244.159.27:8286';
+exports.hub = '127.0.0.1:8286';
 
 exports.passphrase = '';
 
